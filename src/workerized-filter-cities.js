@@ -1,5 +1,6 @@
 import makeFilterCitiesWorker from 'workerize!./filter-cities'
 
+console.log(makeFilterCitiesWorker)
 const {getItems} = makeFilterCitiesWorker()
 
 export {getItems}
