@@ -3,9 +3,9 @@
 
 import * as React from 'react'
 import {useCombobox} from '../use-combobox'
-// import {getItems} from '../filter-cities'
-import {getItems} from '../workerized-filter-cities'
-import {useAsync, useForceRerender} from '../utils'
+import {getItems} from '../filter-cities'
+// import {getItems} from '../workerized-filter-cities'
+import {useForceRerender} from '../utils'
 
 function Menu({
   items,
@@ -32,6 +32,8 @@ function Menu({
   )
 }
 
+Menu = React.memo(Menu)
+
 function ListItem({
   getItemProps,
   item,
@@ -56,15 +58,30 @@ function ListItem({
     />
   )
 }
+ListItem = React.memo(ListItem, (prev, next) => {
+  if (prev.getItemProps !== next.getItemProps) return false
+  if (prev.items !== next.items) return false
+  if (prev.index !== next.index) return false
+  if (prev.selectedItem !== next.selectedItem) return false
+
+  if (prev.highlightedIndex !== next.highlightedIndex) {
+    const wasPrevHighlighted = prev.highlightedIndex === prev.index
+    const isNowHighlighted = next.highlightedIndex === next.index
+    return wasPrevHighlighted === isNowHighlighted
+  }
+  return true
+})
 
 function App() {
   const forceRerender = useForceRerender()
   const [inputValue, setInputValue] = React.useState('')
 
-  const {data: allItems, run} = useAsync({data: [], status: 'pending'})
-  React.useEffect(() => {
-    run(getItems(inputValue))
-  }, [inputValue, run])
+  // with web worker
+  // const {data: allItems, run} = useAsync({data: [], status: 'pending'})
+  // React.useEffect(() => {
+  //   run(getItems(inputValue))
+  // }, [inputValue, run])
+  const allItems = getItems(inputValue)
   const items = allItems.slice(0, 100)
 
   const {
